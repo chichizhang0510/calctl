@@ -1,0 +1,3 @@
+# mkdocs 的站点配置
+# 定义主题、导航、站点名
+# mkdocs build 生成静态站点（通常输出 site/）
