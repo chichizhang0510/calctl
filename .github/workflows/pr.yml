@@ -50,7 +50,7 @@ jobs:
           echo "::endgroup::"
       
       - name: Upload lint reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: lint-reports
@@ -95,7 +95,7 @@ jobs:
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
       
       - name: Upload coverage reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: coverage-reports
@@ -103,7 +103,7 @@ jobs:
           retention-days: 7
       
       - name: Upload test report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-report
@@ -148,7 +148,7 @@ jobs:
           echo "✓ Documentation built successfully"
       
       - name: Upload docs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: documentation
           path: reports/docs/
