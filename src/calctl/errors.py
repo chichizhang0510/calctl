@@ -9,3 +9,6 @@ class NotFoundError(CalctlError):
 
 class StorageError(CalctlError):
     exit_code = 1
+
+class ConflictError(CalctlError):
+    exit_code = 4

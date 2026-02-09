@@ -30,7 +30,7 @@ class Event:
     duration_min: int
     location: str | None
     create_at: datetime
-    update_at: datetime  # because datetime is mutable, we use the name update_time instead of update_at.
+    update_at: datetime
 
     def start_dt(self) -> datetime:
         """

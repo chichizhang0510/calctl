@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 from datetime import datetime,date
 
-from .errors import StorageError
+from .errors import StorageError, InvalidInputError
 from .models import Event
 
 
@@ -59,6 +59,18 @@ class JsonEventStore:
         if any(e["id"] == event.id for e in data["events"]):
             raise StorageError(f"Event with id {event.id} already exists")
         data["events"].append(self._event_to_dict(event))
+        self._save_data(data)
+    
+    def add_many(self, events: list[Event]) -> None:
+        data = self._load_data()
+        existing_ids = {d.get("id") for d in data["events"]}
+
+        for e in events:
+            if e.id in existing_ids:
+                raise StorageError(f'Duplicate event id "{e.id}"')
+            data["events"].append(self._event_to_dict(e))
+            existing_ids.add(e.id)
+
         self._save_data(data)
 
     def update(self, event:Event) -> None:  
@@ -112,7 +124,7 @@ class JsonEventStore:
         data = self._load_data()
         before = len(data["events"])
         data["events"] = [e for e in data["events"] if e["date"] != target.isoformat()]
-        deletd = before - len(data["events"])
+        deleted = before - len(data["events"])
         if deleted > 0:
             self._save_data(data)
         return deleted

@@ -4,7 +4,9 @@ pyproject.toml
 src/calctl/__init__.py
 src/calctl/__main__.py
 src/calctl/cli.py
+src/calctl/color.py
 src/calctl/config.py
+src/calctl/conflict.py
 src/calctl/errors.py
 src/calctl/models.py
 src/calctl/service.py
