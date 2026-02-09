@@ -1,6 +1,7 @@
 # src/calctl/color.py
 import sys
 
+
 class Color:
     """
     Minimal ANSI color helper.
@@ -8,10 +9,7 @@ class Color:
     - only colorize when output is a TTY (avoid polluting redirected output)
     """
     def __init__(self, enabled: bool, *, stream: str = "stdout"):
-        if stream == "stderr":
-            is_tty = sys.stderr.isatty()
-        else:
-            is_tty = sys.stdout.isatty()
+        is_tty = sys.stderr.isatty() if stream == "stderr" else sys.stdout.isatty()
 
         self.enabled = enabled and is_tty
 

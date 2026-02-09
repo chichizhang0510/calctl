@@ -7,17 +7,17 @@ Special error handling is included for CLI-specific errors.
 '''
 
 import argparse
-import sys
 import json
-from typing import Any
-from pathlib import Path
+import sys
 from datetime import date
+from pathlib import Path
+from typing import Any
 
-from .models import Event
 from .color import Color
+from .errors import CalctlError
+from .models import Event
 from .service import CalendarService
 from .store import JsonEventStore
-from .errors import InvalidInputError, NotFoundError, StorageError, CalctlError
 
 
 def default_data_path() -> Path:
@@ -206,7 +206,7 @@ def main() -> None:
     if args.cmd is None:
         parser.print_help()
         raise SystemExit(0)
-    
+
     store = JsonEventStore(default_data_path())
     svc = CalendarService(store)
 
@@ -240,13 +240,13 @@ def main() -> None:
                 from_d = svc.parse_date(args.from_date) if args.from_date else None
                 to_d = svc.parse_date(args.to_date) if args.to_date else None
                 events = svc.list_events(from_date=from_d, to_date=to_d)
-            
+
             else:
                 from_d = date.today()
                 events = svc.list_events(from_date=from_d, to_date=None)
-            
+
             if args.json:
-                print(events_to_json(events)) 
+                print(events_to_json(events))
             else:
                 if not events:
                     print(c_out.yellow("No events found."))
@@ -331,7 +331,7 @@ def main() -> None:
 
                 deleted_events = to_delete
                 deleted_count = svc.delete_on_date(args.date)
-                
+
                 if args.json:
                     print(json.dumps({
                         "date": args.date,
@@ -415,7 +415,7 @@ def main() -> None:
             sys.exit(0)
     except KeyboardInterrupt:
         print(c_err.red("\nCancelled."), file=sys.stderr)
-        raise SystemExit(130)
+        raise SystemExit(130) from None
     except CalctlError as ex:
         print(c_err.red(f"Error: {ex}"), file=sys.stderr)
         sys.exit(ex.exit_code)

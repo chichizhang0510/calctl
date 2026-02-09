@@ -7,7 +7,7 @@ no I/O or CLI-related logic.
 '''
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta, date
+from datetime import date, datetime, timedelta
 
 
 # @dataclass generate __init__ method, __repr__, __eq__, __hash__, __str__ methods
@@ -40,10 +40,10 @@ class Event:
             datetime: A datetime object representing the start time of the event.
         """
         return datetime.combine(
-            self.date, 
+            self.date,
             datetime.strptime(self.start_time, '%H:%M').time()  # string parse time: change string to time object. time() only return time not date
         )
-    
+
     def end_dt(self) -> datetime:
         """
         Compute the end datetime of the event.

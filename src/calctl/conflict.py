@@ -5,6 +5,7 @@ This module provides functions to detect conflicts between calendar events.
 '''
 
 from __future__ import annotations  # for type hints
+
 from .models import Event
 
 

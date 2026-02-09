@@ -15,5 +15,6 @@ src/calctl.egg-info/PKG-INFO
 src/calctl.egg-info/SOURCES.txt
 src/calctl.egg-info/dependency_links.txt
 src/calctl.egg-info/entry_points.txt
+src/calctl.egg-info/requires.txt
 src/calctl.egg-info/top_level.txt
 tests/test_smoke.py

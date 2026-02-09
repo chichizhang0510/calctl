@@ -5,15 +5,14 @@ This module contains the business logic for the calendar application.
 It handles the interaction between the CLI and the data store.
 '''
 
-from pathlib import Path
-from datetime import datetime, date, timedelta
-from secrets import token_hex
 from dataclasses import replace
+from datetime import date, datetime, timedelta
+from secrets import token_hex
 
 from .conflict import overlaps
+from .errors import ConflictError, InvalidInputError, NotFoundError
 from .models import Event
 from .store import JsonEventStore
-from .errors import InvalidInputError, NotFoundError, StorageError, ConflictError
 
 
 class CalendarService:
@@ -25,9 +24,9 @@ class CalendarService:
     '''
     def __init__(self, store: JsonEventStore):
         self.store = store
-    
-    def add_event(self, 
-            title: str, 
+
+    def add_event(self,
+            title: str,
             date_str: str,
             time_str: str,
             duration: int,
@@ -74,7 +73,7 @@ class CalendarService:
             if repeat not in ("daily", "weekly"):
                 raise InvalidInputError('--repeat must be "daily" or "weekly"')
             step = timedelta(days=1) if repeat == "daily" else timedelta(weeks=1)
-        
+
         new_events: list[Event] = []
 
         for i in range(count):
@@ -91,12 +90,12 @@ class CalendarService:
                 update_at=now,
             )
 
-            
+
             if e.end_dt().date() != e.start_dt().date():
                 raise InvalidInputError("Event cannot cross midnight (duration too long)")
 
             new_events.append(e)
-        
+
         if not force:
             existing = self.store.list_all()
 
@@ -119,7 +118,7 @@ class CalendarService:
 
         self.store.add_many(new_events)
         return new_events
-    
+
     def list_events(self,
         *,
         from_date: date | None = None,
@@ -143,7 +142,7 @@ class CalendarService:
 
         if today_only:
             return [e for e in events if e.date == today]
-        
+
         if week:
             # week starts on Sunday
             # Python weekday(): Mon=0 ... Sun=6
@@ -151,7 +150,7 @@ class CalendarService:
             week_start = today - timedelta(days=days_since_sun)
             week_end = week_start + timedelta(days=6)
             return [e for e in events if week_start <= e.date <= week_end]
-        
+
         if from_date is not None or to_date is not None:
             if from_date is None:
                 from_date = date.min
@@ -160,7 +159,7 @@ class CalendarService:
             return [e for e in events if from_date <= e.date <= to_date]
 
         return [e for e in events if e.date >= today]
-    
+
     def show_event(self, event_id: str) -> Event:
         '''
         Show an event by its id.
@@ -175,14 +174,14 @@ class CalendarService:
         if e is None:
             raise NotFoundError(f"Event with id {event_id} not found")
         return e
-    
+
     def show_event_with_conflicts(self, event_id: str) -> tuple[Event, list[Event]]:
         e = self.show_event(event_id)
         all_events = self.store.list_all()
         conflicts = [x for x in all_events if overlaps(e, x)]
         conflicts.sort(key=lambda x: (x.date.isoformat(), x.start_time, x.id))
         return e, conflicts
-    
+
     def delete_event(self, event_id: str) -> Event:
         '''
         Delete an event by its id.
@@ -196,11 +195,11 @@ class CalendarService:
         e = self.store.get_by_id(event_id)
         if e is None:
             raise NotFoundError(f"Event {event_id} not found")
-        
+
         ok = self.store.delete_by_id(event_id)
         if not ok:
             raise NotFoundError(f"Event {event_id} not found")
-        
+
         return e
 
     def get_events_on_date(self, date_str: str) -> list[Event]:
@@ -216,7 +215,7 @@ class CalendarService:
         d = self._parse_date(date_str)
         events = [e for e in self.store.list_all() if e.date == d]
         return events
-    
+
     def delete_on_date(self, date_str: str) -> int:
         '''
         Delete events on a date.
@@ -229,11 +228,11 @@ class CalendarService:
         '''
         d = self._parse_date(date_str)
         return self.store.delete_by_date(d.isoformat())
-    
+
     def parse_date(self, s: str) -> date:
         """Public wrapper for date parsing"""
         return self._parse_date(s)
-    
+
     def edit_event(
         self,
         event_id: str,
@@ -321,7 +320,7 @@ class CalendarService:
         add_change("location", old.location, updated.location)
 
         return updated, changes
-    
+
     def search_events(self, query: str, *, title_only: bool = False) -> list[Event]:
         q = (query or "").strip().lower()
         if not q:
@@ -346,7 +345,7 @@ class CalendarService:
         matched = [e for e in events if q in haystack(e)]
         matched.sort(key=lambda e: (e.date.isoformat(), e.start_time, e.id))
         return matched
-    
+
     def agenda_day(self, d: date) -> list[Event]:
         events = [e for e in self.store.list_all() if e.date == d]
         events.sort(key=lambda e: (e.start_time, e.id))
@@ -397,7 +396,7 @@ class CalendarService:
             # expects YYYY-MM-DD
             return date.fromisoformat(s)
         except ValueError:
-            raise InvalidInputError(f'Invalid date format "{s}" (expected YYYY-MM-DD)')
+            raise InvalidInputError(f'Invalid date format "{s}" (expected YYYY-MM-DD)') from None
 
     def _normalize_time(self, s: str) -> str:
         '''
@@ -415,7 +414,7 @@ class CalendarService:
             # normalize to zero-padded HH:MM
             return dt.strftime("%H:%M")
         except ValueError:
-            raise InvalidInputError(f'Invalid time format "{s}" (expected HH:MM 24-hour)')
+            raise InvalidInputError(f'Invalid time format "{s}" (expected HH:MM 24-hour)') from None
 
     def _validate_duration(self, duration: int) -> int:
         '''

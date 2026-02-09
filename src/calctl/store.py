@@ -8,12 +8,11 @@ It handles the serialization and deserialization of event data to and from JSON.
 from __future__ import annotations
 
 import json
-from dataclasses import asdict
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
-from datetime import datetime,date
 
-from .errors import StorageError, InvalidInputError
+from .errors import InvalidInputError, StorageError
 from .models import Event
 
 
@@ -32,8 +31,8 @@ class JsonEventStore:
         events = [self._event_from_dict(e) for e in data["events"]]
         events.sort(key=lambda e: (e.date.isoformat(), e.start_time, e.id))
         return events
-    
-    def get_by_id(self, event_id: str) -> Event | None: 
+
+    def get_by_id(self, event_id: str) -> Event | None:
         '''
         Get an event by its id.
 
@@ -47,7 +46,7 @@ class JsonEventStore:
             if e["id"] == event_id:
                 return self._event_from_dict(e)
         return None
-    
+
     def add(self, event:Event) -> None:
         '''
         Add an event to the store.
@@ -57,23 +56,23 @@ class JsonEventStore:
         '''
         data = self._load_data()
         if any(e["id"] == event.id for e in data["events"]):
-            raise StorageError(f"Event with id {event.id} already exists")
+            raise StorageError(f"Event with id {event.id} already exists") from None
         data["events"].append(self._event_to_dict(event))
         self._save_data(data)
-    
+
     def add_many(self, events: list[Event]) -> None:
         data = self._load_data()
         existing_ids = {d.get("id") for d in data["events"]}
 
         for e in events:
             if e.id in existing_ids:
-                raise StorageError(f'Duplicate event id "{e.id}"')
+                raise StorageError(f'Duplicate event id "{e.id}"') from None
             data["events"].append(self._event_to_dict(e))
             existing_ids.add(e.id)
 
         self._save_data(data)
 
-    def update(self, event:Event) -> None:  
+    def update(self, event:Event) -> None:
         '''
         Update an event in the store.
 
@@ -86,7 +85,7 @@ class JsonEventStore:
                 data["events"][i] = self._event_to_dict(event)
                 self._save_data(data)
                 return
-        raise StorageError(f"Event with id {event.id} not found")
+        raise StorageError(f"Event with id {event.id} not found") from None
 
     def delete_by_id(self, event_id: str) -> bool:
         '''
@@ -105,7 +104,7 @@ class JsonEventStore:
                 self._save_data(data)
                 return True
         return False
-    
+
     def delete_by_date(self, date_str: str) -> int:
         '''
         Delete events by date.
@@ -119,8 +118,8 @@ class JsonEventStore:
         try :
             target = date.fromisoformat(date_str.strip())
         except ValueError:
-            raise InvalidInputError(f"Invalid date format: {date_str}")
-        
+            raise InvalidInputError(f"Invalid date format: {date_str}") from None
+
         data = self._load_data()
         before = len(data["events"])
         data["events"] = [e for e in data["events"] if e["date"] != target.isoformat()]
@@ -128,7 +127,7 @@ class JsonEventStore:
         if deleted > 0:
             self._save_data(data)
         return deleted
-    
+
 
     # ---------- internal helpers ----------
 
@@ -144,9 +143,9 @@ class JsonEventStore:
             if not self.path.exists():
                 self.path.write_text(json.dumps({"events": []}, indent=2), encoding="utf-8")
         except Exception as e:
-            raise StorageError(f"Failed to ensure file exists: {e}")
+            raise StorageError(f"Failed to ensure file exists: {e}") from None
 
-    def _load_data(self) -> list[dict[str, Any]]:
+    def _load_data(self) -> dict[str, list[dict[str, Any]]]:
         '''
         Load the data from the file.
 
@@ -158,19 +157,19 @@ class JsonEventStore:
             raw = self.path.read_text(encoding="utf-8")
             if not raw:
                 return {"events": []}
-            
+
             data = json.loads(raw)
             if isinstance(data, list):
                 return {"events": data}
             if isinstance(data, dict) and "events" in data:
                 return data
-            raise StorageError(f"Invalid data format: {data}")
+            raise StorageError(f"Invalid data format: {data}") from None
         except json.JSONDecodeError as e:
-            raise StorageError(f"Failed to parse JSON: {e}")
+            raise StorageError(f"Failed to parse JSON: {e}") from None
         except OSError as e:
-            raise StorageError(f"Failed to read file: {e}")
-    
-    def _save_data(self, data: list[dict[str, Any]]) -> None:
+            raise StorageError(f"Failed to read file: {e}") from None
+
+    def _save_data(self, data: dict[str, list[dict[str, Any]]]) -> None:
         '''
         Save the data to the file.
 
@@ -184,14 +183,14 @@ class JsonEventStore:
             tmp.write_text(content, encoding="utf-8")
             tmp.replace(self.path)
         except OSError as e:
-            raise StorageError(f"Failed to write file: {e}")
+            raise StorageError(f"Failed to write file: {e}") from None
         finally:
             try:
                 if tmp.exists():
                     tmp.unlink()
             except OSError as e:
                 raise StorageError(f"Failed to delete temporary file: {e}")
-    
+
     def _event_to_dict(self, event: Event) -> dict[str, Any]:
         '''
         Convert an event to a dictionary.
@@ -210,7 +209,7 @@ class JsonEventStore:
             "create_at": event.create_at.isoformat(),
             "update_at": event.update_at.isoformat(),
         }
-    
+
     def _event_from_dict(self, data: dict[str, Any]) -> Event:
         '''
         Convert a dictionary to an event.
@@ -231,4 +230,4 @@ class JsonEventStore:
                 update_at=datetime.fromisoformat(data["update_at"]),
             )
         except KeyError as e:
-            raise StorageError(f"Missing required field: {e}")
+            raise StorageError(f"Missing required field: {e}") from None

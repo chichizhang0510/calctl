@@ -1,0 +1,21 @@
+Mypy Type Check Coverage Summary
+================================
+
+Script: index
+
++-----------------+-------------------+----------+
+| Module          | Imprecision       | Lines    |
++-----------------+-------------------+----------+
+| calctl          |   0.00% imprecise |   17 LOC |
+| calctl.__main__ |   0.00% imprecise |    4 LOC |
+| calctl.cli      |  19.24% imprecise |  421 LOC |
+| calctl.color    |   0.00% imprecise |   31 LOC |
+| calctl.config   |   0.00% imprecise |    1 LOC |
+| calctl.conflict |   0.00% imprecise |   27 LOC |
+| calctl.errors   |   0.00% imprecise |   14 LOC |
+| calctl.models   |   0.00% imprecise |   55 LOC |
+| calctl.service  |   0.00% imprecise |  436 LOC |
+| calctl.store    |  21.03% imprecise |  233 LOC |
++-----------------+-------------------+----------+
+| Total           |  10.49% imprecise | 1239 LOC |
++-----------------+-------------------+----------+
