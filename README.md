@@ -2,7 +2,7 @@
 
 A command-line calendar management tool.
 [![CI Status](https://github.com/chichizhang0510/calctl/workflows/Main%20Branch%20CI/badge.svg)](https://github.com/chichizhang0510/calctl/actions)
-[![Coverage](https://codecov.io/gh/chichizhang0510/calctl/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/calctl)
+[![Coverage](https://codecov.io/gh/chichizhang0510/calctl/branch/main/graph/badge.svg)](https://codecov.io/gh/chichizhang0510/calctl)
 [![Docker](https://img.shields.io/docker/v/chichizhang/calctl)](https://hub.docker.com/r/chichizhang/calctl)
 
 This project demonstrates:
