@@ -380,7 +380,7 @@ class CalendarService:
             str: A new event id.
         '''
         # short memorable id like evt-7d3f
-        return f"evt-{token_hex(2)}"  # 4 hex chars
+        return f"evt-{token_hex(4)}"  # 4 hex chars
 
     def _parse_date(self, s: str) -> date:
         '''
