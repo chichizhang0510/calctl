@@ -117,7 +117,7 @@ jobs:
       
       - name: Install build tools
         run: |
-          pip install build
+          pip install build twine
       
       - name: Build package
         run: |
