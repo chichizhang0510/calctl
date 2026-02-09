@@ -1,3 +1,25 @@
-# mkdocs 的站点配置
-# 定义主题、导航、站点名
-# mkdocs build 生成静态站点（通常输出 site/）
+site_name: calctl Documentation
+site_description: A command-line calendar management tool
+site_author: ChiChi Zhang
+site_url: https://chichizhang0510.github.io/calctl/
+
+repo_name: chichizhang0510/calctl
+repo_url: https://github.com/chichizhang0510/calctl
+
+theme:
+  name: material
+  palette:
+    primary: indigo
+    accent: blue
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - toc.integrate
+
+nav:
+  - Home: index.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - pymdownx.superfences
