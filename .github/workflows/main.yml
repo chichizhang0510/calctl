@@ -188,7 +188,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./reports/docs
   
-    quality-gate:
+  quality-gate:
     name: Quality Gate (Main)
     runs-on: ubuntu-latest
     needs: [lint, test, build, docs]
